@@ -3,7 +3,7 @@ var player = require("play-sound")((opts = {}));
 
 require("dotenv").config();
 
-(async () => {
+const checkMyArea = async () => {
   const browser = await puppeteer.launch({
     args: ["--no-sandbox", "--disable-setuid-sandbox"]
   });
@@ -40,6 +40,10 @@ require("dotenv").config();
 
     numberOfCases = newNumberOfCases;
 
+    await page.waitFor(10000);
+
     await page.reload();
   }
-})();
+};
+
+checkMyArea();
