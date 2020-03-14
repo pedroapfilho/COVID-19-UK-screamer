@@ -4,7 +4,7 @@ const fetch = require("isomorphic-unfetch");
 require("dotenv").config();
 
 const checkMyArea = async () => {
-  let numberOfCases;
+  let cases;
 
   console.log("Running");
 
@@ -19,14 +19,16 @@ const checkMyArea = async () => {
       place => place.attributes.GSS_NM === process.env.AREA
     );
 
-    const newNumberOfCases = area.attributes.TotalCases;
+    const newCases = area.attributes.TotalCases;
 
-    if (newNumberOfCases > numberOfCases) {
+    if (newCases > cases) {
       console.log("FUCK");
       player.play("scream.mp3");
     }
 
-    numberOfCases = newNumberOfCases;
+    cases = newCases;
+
+    await new Promise(res => setTimeout(res, 10000));
   }
 };
 
