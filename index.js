@@ -1,35 +1,25 @@
-const puppeteer = require("puppeteer");
-var player = require("play-sound")((opts = {}));
+const player = require("play-sound")((opts = {}));
+const fetch = require("isomorphic-unfetch");
 
 require("dotenv").config();
 
 const checkMyArea = async () => {
-  const browser = await puppeteer.launch({
-    args: ["--no-sandbox", "--disable-setuid-sandbox"]
-  });
-  const page = await browser.newPage();
-
-  await page.goto(
-    "https://www.gov.uk/government/publications/coronavirus-covid-19-number-of-cases-in-england/coronavirus-covid-19-number-of-cases-in-england",
-    {
-      waitUntil: "networkidle0"
-    }
-  );
-
   let numberOfCases;
 
   console.log("Running");
 
   while (true) {
-    const data = await page.$$eval("table tr td", tds =>
-      tds.map(td => {
-        return td.innerHTML;
-      })
+    const res = await fetch(
+      "https://services1.arcgis.com/0IrmI40n5ZYxTUrV/arcgis/rest/services/CountyUAs_cases/FeatureServer/0/query?f=json&where=TotalCases%20%3C%3E%200&returnGeometry=false&spatialRel=esriSpatialRelIntersects&outFields=*&orderByFields=TotalCases%20desc&resultOffset=0&resultRecordCount=1000"
     );
 
-    const indexOfArea = data.indexOf(process.env.AREA);
+    const data = await res.json();
 
-    const newNumberOfCases = Number(data[indexOfArea + 1]);
+    const area = data.features.find(
+      place => place.attributes.GSS_NM === process.env.AREA
+    );
+
+    const newNumberOfCases = area.attributes.TotalCases;
 
     if (newNumberOfCases > numberOfCases) {
       console.log("FUCK");
@@ -39,10 +29,6 @@ const checkMyArea = async () => {
     }
 
     numberOfCases = newNumberOfCases;
-
-    await page.waitFor(10000);
-
-    await page.reload();
   }
 };
 
