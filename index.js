@@ -23,9 +23,7 @@ const checkMyArea = async () => {
 
     if (newNumberOfCases > numberOfCases) {
       console.log("FUCK");
-      player.play("scream.mp3", err => {
-        if (err) throw err;
-      });
+      player.play("scream.mp3");
     }
 
     numberOfCases = newNumberOfCases;
